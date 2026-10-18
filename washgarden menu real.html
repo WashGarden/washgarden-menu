@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Wash Garden | メニューを選ぶ</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wash Garden">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#121212;
+    --surface:#1B1B1B;
+    --surface2:#232323;
+    --ink:#F2F0EC;
+    --ink-soft:#A8A39B;
+    --line:#333130;
+    --gold:#C9A227;
+    --gold-soft:#8A7320;
+    --red:#9E1B1B;
+    --red-bright:#D4302F;
+    --bar:#0C0C0C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    font-family:'Noto Sans JP', sans-serif;
+    color:var(--ink);
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+    padding-bottom:128px;
+  }
+  .disp{font-family:'Barlow Condensed', sans-serif; font-weight:700;}
+
+  header{
+    background:var(--surface);
+    padding:18px 20px 0 20px;
+    border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:20;
+  }
+  .brandrow{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mark{
+    width:36px; height:36px; border-radius:8px;
+    background:linear-gradient(160deg, #2a2a2a 0%, #0c0c0c 100%);
+    border:1px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--gold); font-family:'Barlow Condensed'; font-weight:700; font-size:17px;
+  }
+  .brand-name{font-size:19px; font-weight:700; letter-spacing:0.02em;}
+  .brand-sub{font-size:10.5px; color:var(--gold-soft); margin-top:1px; letter-spacing:0.03em;}
+  .step-label{font-size:12px; color:var(--ink-soft);}
+
+  .cartype{display:flex; gap:8px; padding-bottom:14px;}
+  .cartype button{
+    flex:1; padding:9px 4px; border-radius:10px; border:1px solid var(--line);
+    background:var(--surface2); font-family:'Noto Sans JP'; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+  }
+  .cartype button .sz{font-family:'Barlow Condensed'; font-size:18px; font-weight:700; color:var(--ink-soft); line-height:1;}
+  .cartype button .cls{font-size:10px; color:var(--ink-soft);}
+  .cartype button.active{ border-color:var(--gold); background:#2A2308; }
+  .cartype button.active .sz{color:var(--gold);}
+  .cartype button.active .cls{color:#D9C06A;}
+  .cartype button.cp{flex:0 0 58px;}
+  .cartype button.cp.active{ border-color:var(--red-bright); background:#3A0F0F; }
+  .cartype button.cp.active .sz{color:var(--red-bright);}
+  .cartype button.cp.active .cls{color:#E79B9B;}
+
+  nav.cats{
+    display:flex; gap:6px; overflow-x:auto; padding:0 20px 14px 20px;
+    background:var(--surface); border-bottom:1px solid var(--line);
+    scrollbar-width:none;
+  }
+  nav.cats::-webkit-scrollbar{display:none;}
+  nav.cats button{
+    white-space:nowrap; padding:9px 16px; border-radius:999px; border:1px solid var(--line);
+    background:var(--bg); color:var(--ink-soft); font-family:'Noto Sans JP'; font-size:13px; font-weight:500;
+    cursor:pointer;
+  }
+  nav.cats button.active{
+    background:var(--gold); color:#1A1400; border-color:var(--gold); font-weight:700;
+  }
+
+  main{padding:18px 20px 10px 20px; max-width:640px; margin:0 auto;}
+  .cat-heading{font-size:13px; color:var(--ink-soft); margin:18px 2px 4px 2px; font-weight:500;}
+  .cat-heading:first-child{margin-top:2px;}
+  .cat-note{font-size:11.5px; color:var(--gold-soft); margin:0 2px 10px 2px;}
+
+  .item{
+    background:var(--surface2); border:1px solid var(--line); border-radius:14px;
+    padding:14px; margin-bottom:10px; display:flex; align-items:center; gap:14px;
+    cursor:pointer; transition:border-color .15s, background .15s;
+  }
+  .item.has-table{align-items:flex-start;}
+  .item.checked{ border-color:var(--gold); background:#241F0C; }
+
+  .size-table{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:10px;
+  }
+  .sp-cell{
+    border:1px solid var(--line); border-radius:9px; padding:6px 4px; text-align:center;
+    background:var(--bg);
+  }
+  .sp-cell.active{ border-color:var(--gold); background:#2A2308; }
+  .sp-sz{display:block; font-family:'Barlow Condensed'; font-size:13px; font-weight:600; color:var(--ink-soft);}
+  .sp-cell.active .sp-sz{color:var(--gold);}
+  .sp-val{display:block; font-family:'Barlow Condensed'; font-size:15px; font-weight:600; color:var(--ink); margin-top:1px;}
+
+  .drop{
+    position:relative; width:28px; height:28px; flex:0 0 auto;
+  }
+  .drop input{position:absolute; opacity:0; width:100%; height:100%; margin:0; cursor:pointer;}
+  .drop-shape{
+    position:absolute; inset:0; border:2px solid #4A4742; border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg); background:transparent; transition:background .18s, border-color .18s, transform .18s;
+  }
+  .drop input:checked ~ .drop-shape{
+    background:var(--gold); border-color:var(--gold); transform:rotate(-45deg) scale(1.08);
+  }
+  .drop-check{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    opacity:0; transition:opacity .15s; pointer-events:none;
+  }
+  .drop input:checked ~ .drop-check{opacity:1;}
+  .drop-check svg{width:12px; height:12px; transform:rotate(45deg); margin-top:2px;}
+
+  .item-body{flex:1; min-width:0;}
+  .item-name{font-size:14.5px; font-weight:500; line-height:1.4;}
+  .item-desc{font-size:12px; color:var(--ink-soft); margin-top:2px; line-height:1.5;}
+  .item-price{font-family:'Barlow Condensed'; font-size:19px; font-weight:600; white-space:nowrap; text-align:right; color:var(--ink);}
+  .item-price.range{font-family:'Noto Sans JP'; font-size:12px; font-weight:500; color:var(--gold-soft); max-width:92px; white-space:normal; text-align:right; line-height:1.4;}
+  .item-tag{
+    display:inline-block; font-size:10.5px; font-weight:700; color:#FFF2E0; background:var(--red);
+    border-radius:5px; padding:2px 7px; margin-top:6px;
+  }
+
+  .fp-card{
+    background:var(--surface2); border:1px solid var(--red); border-radius:14px;
+    padding:14px; margin-top:4px;
+  }
+  .fp-head{display:flex; align-items:center; gap:14px; cursor:pointer;}
+  .fp-title{font-size:15px; font-weight:700; line-height:1.4;}
+  .fp-sub{font-size:11.5px; color:var(--ink-soft); margin-top:3px; line-height:1.5;}
+  .fp-base{
+    display:flex; justify-content:space-between; gap:10px; font-size:12.5px; color:var(--ink-soft);
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    margin-top:12px; padding:10px 0;
+  }
+  .fp-base span:last-child{font-family:'Barlow Condensed'; font-size:15px; font-weight:600; color:var(--ink); white-space:nowrap;}
+  .fp-addons{margin-top:4px;}
+  .fp-row{
+    display:flex; align-items:center; gap:10px; padding:8px 0; cursor:pointer;
+    border-bottom:1px solid var(--line);
+  }
+  .fp-row:last-child{border-bottom:none;}
+  .fp-row-name{flex:1; font-size:13px;}
+  .fp-row-price{font-family:'Barlow Condensed'; font-size:14.5px; font-weight:600; color:var(--ink-soft); white-space:nowrap;}
+  .fp-row.off .fp-row-name{color:var(--ink-soft); text-decoration:line-through;}
+  .fp-row.off .fp-row-price{color:#5A5753; text-decoration:line-through;}
+  .fp-drop{position:relative; width:20px; height:20px; flex:0 0 auto;}
+  .fp-drop-shape{
+    position:absolute; inset:0; border:1.5px solid #4A4742; border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg); transition:background .15s, border-color .15s;
+  }
+  .fp-row:not(.off) .fp-drop-shape{ background:var(--gold); border-color:var(--gold); }
+  .fp-subtotal{
+    display:flex; justify-content:space-between; align-items:baseline; margin-top:10px; padding-top:10px;
+    border-top:1px solid var(--line);
+  }
+  .fp-subtotal .label{font-size:12px; color:var(--ink-soft);}
+  .fp-subtotal .val{font-family:'Barlow Condensed'; font-size:22px; font-weight:700; color:var(--gold);}
+  .fp-card:not(.on) .fp-addons, .fp-card:not(.on) .fp-base{opacity:0.45;}
+
+  .bottombar{
+    position:fixed; left:0; right:0; bottom:0; z-index:30;
+    background:var(--bar); color:#fff; border-top:1px solid var(--line);
+    padding:14px 20px calc(14px + env(safe-area-inset-bottom)) 20px;
+  }
+  .bb-inner{max-width:640px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:14px;}
+  .bb-left{min-width:0;}
+  .bb-label{font-size:11px; color:#8B8680; margin-bottom:2px;}
+  .bb-total{font-family:'Barlow Condensed'; font-size:29px; font-weight:700; line-height:1; color:var(--gold);}
+  .bb-total .yen{font-size:16px; margin-right:2px; font-weight:600;}
+  .bb-note{font-size:11px; color:#9A8F6A; margin-top:4px; line-height:1.5;}
+  .bb-btn{
+    flex:0 0 auto; background:var(--red); color:#fff; border:none; border-radius:11px;
+    padding:14px 18px; font-family:'Noto Sans JP'; font-size:14px; font-weight:700; cursor:pointer;
+  }
+  .bb-btn:active{transform:scale(0.98); background:var(--red-bright);}
+
+  .foot-note{
+    text-align:center; font-size:11px; color:var(--ink-soft); padding:12px 20px 4px 20px;
+  }
+
+  .print-only{display:none;}
+
+  @media print{
+    body > *:not(#printArea){display:none !important;}
+    #printArea{display:block !important;}
+    body{background:#fff; color:#000; padding:0;}
+    .receipt{
+      width:100%; max-width:380px; margin:0 auto; padding:16px 10px;
+      font-family:'Noto Sans JP', sans-serif; color:#000;
+    }
+    .r-shopname{font-family:'Barlow Condensed'; font-size:24px; font-weight:700; text-align:center;}
+    .r-sub{font-size:11px; text-align:center; color:#444; margin-bottom:10px;}
+    .r-meta{font-size:12px; margin:10px 0; border-top:1px dashed #000; border-bottom:1px dashed #000; padding:8px 0;}
+    .r-meta div{display:flex; justify-content:space-between; margin:2px 0;}
+    .r-rows{font-size:12.5px; margin:10px 0;}
+    .r-row{display:flex; justify-content:space-between; gap:10px; padding:4px 0; border-bottom:1px dotted #999;}
+    .r-rowname{flex:1;}
+    .r-total{display:flex; justify-content:space-between; font-size:16px; font-weight:700; border-top:2px solid #000; margin-top:8px; padding-top:8px;}
+    .r-note{font-size:10.5px; color:#555; margin-top:4px;}
+    .r-field{margin-top:20px; font-size:12.5px;}
+    .r-field .label{font-size:11px; color:#444; margin-bottom:4px;}
+    .r-field .line{border-bottom:1px solid #000; height:26px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brandrow">
+    <div class="brand">
+      <div class="brand-mark">WG</div>
+      <div>
+        <div class="brand-name">Wash Garden</div>
+        <div class="brand-sub">セラミックコーティング専門店</div>
+      </div>
+    </div>
+    <div class="step-label" id="selCount">0件選択中</div>
+  </div>
+  <div class="cartype" id="carType"></div>
+</header>
+
+<nav class="cats" id="catNav"></nav>
+
+<main id="mainArea"></main>
+
+<div class="foot-note">※表示価格はすべて税込です</div>
+
+<div class="bottombar">
+  <div class="bb-inner">
+    <div class="bb-left">
+      <div class="bb-label">合計(税込)</div>
+      <div class="bb-total"><span class="yen">¥</span><span id="totalNum">0</span></div>
+      <div class="bb-note" id="bbNote" style="display:none;"></div>
+    </div>
+    <button class="bb-btn" onclick="finishSelection()">選択を終了する</button>
+  </div>
+</div>
+
+<div id="printArea" class="print-only"></div>
+
+<script>
+const carSizes = [
+  {id:'S', cls:'軽自動車'},
+  {id:'M', cls:'5ナンバー車'},
+  {id:'L', cls:'3ナンバー車'},
+  {id:'XL', cls:'ミニバン・SUV'},
+  {id:'CP', cls:'キャンペーン', campaign:true}
+];
+
+const categories = [
+  {id:'campaign', label:'キャンペーン'},
+  {id:'coating', label:'コーティング'},
+  {id:'coating-option', label:'コーティングオプション'},
+  {id:'wash', label:'洗車'},
+  {id:'wash-option', label:'洗車オプション'}
+];
+
+const catNotes = {
+  'coating':'グレード・層数はいずれか1つをお選びください',
+  'campaign':'期間限定キャンペーンメニューです(車種によらない料金のものを含みます)'
+};
+
+const fullPackageBase = 76780;
+const fullPackageAddons = [
+  {id:'fp-finish', name:'仕上げ研磨', price:33000},
+  {id:'fp-basecoat', name:'ベースコート追加', price:33000},
+  {id:'fp-tomagnite', name:'CARBON→MAGNITEへ変更', price:44000},
+  {id:'fp-magnite2', name:'MAGNITE 1層追加(2層施工に)', price:55000},
+  {id:'fp-oilfilm', name:'窓ガラス油膜落とし', price:11000},
+  {id:'fp-glasscoat', name:'窓ガラスコーティング', price:11000},
+  {id:'fp-wheelcoat', name:'ホイールコーティング', price:8800},
+  {id:'fp-tirecoat', name:'タイヤコーティング', price:11000},
+  {id:'fp-resinpart', name:'樹脂パーツコーティング', price:16500},
+  {id:'fp-detail', name:'細部パーツ施工', price:11000},
+  {id:'fp-interior-clean', name:'車内清掃', price:5500},
+  {id:'fp-interior-coat', name:'車内コーティング', price:11000},
+  {id:'fp-ozone', name:'オゾン脱臭', price:3300}
+];
+
+const items = [
+  {id:'cp-special', cat:'campaign', name:'セラミックコーティング SPECIAL PRICE', desc:'CARBON 1層相当のコーティング(通常¥165,000)。全車種共通価格', price:76780, tag:'10月限定'},
+  {id:'cp-magnite-pkg', cat:'campaign', name:'Magnite Package', desc:'洗車・鉄粉除去・水垢除去・下地研磨・マグナイトコーティング1層・窓ガラス油膜除去撥水・ホイールコーティングをまとめて。全車種共通価格', price:110000},
+  {id:'cp-magnite-double', cat:'campaign', name:'Magnite Double Package', desc:'マグナイトを2層施工。深い艶と高い保護性能、ホイールコーティング込み。全車種共通価格', price:165000},
+  {id:'cp-ceramic-boost', cat:'campaign', name:'メンテナンス CERAMIC BOOST', desc:'艶・撥水・防汚性能をリフレッシュ。既存施工車限定。全車種共通価格', price:54780},
+
+  {id:'coat-carbon-1', cat:'coating', group:'coating-grade', name:'Ultra Coat カーボン(1層塗り)', desc:'深い艶と強撥水性(接触角110°)、UVカット・薬品耐性', price:{S:165000,M:198000,L:231000,XL:264000}},
+  {id:'coat-carbon-2', cat:'coating', group:'coating-grade', name:'Ultra Coat カーボン(2層塗り)', desc:'1層よりさらなる艶とスリック性能', price:{S:198000,M:242000,L:286000,XL:330000}},
+  {id:'coat-magnite-1', cat:'coating', group:'coating-grade', name:'Ultra Coat マグナイト(1層塗り)', desc:'ハイブリッドナノセラミック、強撥水+スケール耐性', price:{S:275000,M:308000,L:341000,XL:374000}},
+  {id:'coat-magnite-2', cat:'coating', group:'coating-grade', name:'Ultra Coat マグナイト(2層塗り)', desc:'マグナイトの艶・撥水・耐久性をさらに強化', price:{S:308000,M:352000,L:396000,XL:440000}},
+
+  {id:'opt-specialcolor', cat:'coating-option', name:'特殊カラー車両', desc:'マット等、特殊塗装車への対応', price:33000},
+  {id:'opt-extralayer', cat:'coating-option', name:'追加施工 1層ごとに', desc:'指定グレードにさらに1層追加', price:55000},
+  {id:'opt-partial2', cat:'coating-option', name:'各所指定2層塗', desc:'指定箇所のみ2層仕上げ', price:16500},
+  {id:'opt-glasscoat', cat:'coating-option', name:'窓ガラスコーティング', desc:'フロントガラス等へのコーティング施工', price:11000},
+  {id:'opt-oilfilm', cat:'coating-option', name:'窓ガラス油膜落とし', desc:'※水垢が残っている場合は+¥7,700', price:11000},
+  {id:'opt-wheelcoat', cat:'coating-option', name:'ホイールコーティング(4本)', desc:'ホイール全体を保護コーティング', price:8800},
+  {id:'opt-resincoat', cat:'coating-option', name:'樹脂コーティング', desc:'部位により金額が異なります', rangeNote:'¥5,500〜¥16,500\n(要見積り)'},
+  {id:'opt-sanitize', cat:'coating-option', name:'室内除菌洗浄', desc:'', price:1100},
+  {id:'opt-seatclean', cat:'coating-option', name:'室内シート清掃', desc:'', price:5500},
+  {id:'opt-seatcoat', cat:'coating-option', name:'室内シートコーティング', desc:'', price:11000},
+  {id:'opt-ozone', cat:'coating-option', name:'室内オゾン脱臭', desc:'', price:3300},
+
+  {id:'wash-foam', cat:'wash', name:'手洗い泡洗車', desc:'コーティング被膜を傷めない専用シャンプーで優しく洗い上げ', price:{S:2200,M:2750,L:3300,XL:3850}},
+  {id:'wash-maintenance', cat:'wash', name:'メンテナンス洗車', desc:'セラミック成分を上塗り補強しながら洗車。コーティング施工車向け', price:{S:4950,M:6050,L:7150,XL:8250}},
+
+  {id:'wo-iron', cat:'wash-option', name:'鉄粉除去', desc:'', price:3300},
+  {id:'wo-iron-clay', cat:'wash-option', name:'鉄粉除去(粘土)', desc:'', price:6600},
+  {id:'wo-scale', cat:'wash-option', name:'水垢・軽度スケール除去', desc:'', price:3300},
+  {id:'wo-pitch', cat:'wash-option', name:'ピッチ・タール除去', desc:'', price:2200},
+  {id:'wo-bug', cat:'wash-option', name:'虫汚れ除去', desc:'', price:1100},
+  {id:'wo-wheel-surface', cat:'wash-option', name:'ホイール洗浄(表面)', desc:'', price:2200},
+  {id:'wo-wheel-back', cat:'wash-option', name:'ホイール洗浄(裏側込み)', desc:'', price:3300},
+  {id:'wo-resinpart', cat:'wash-option', name:'樹脂パーツコーティング', desc:'', price:4400},
+  {id:'wo-glass-front', cat:'wash-option', name:'ガラス撥水(フロント)', desc:'', price:3300},
+  {id:'wo-glass-all', cat:'wash-option', name:'ガラス撥水(全面)', desc:'', price:6600},
+  {id:'wo-door', cat:'wash-option', name:'ドア内・給油口清掃', desc:'', price:1100},
+  {id:'wo-engine', cat:'wash-option', name:'エンジンルーム簡易清掃', desc:'', price:2200},
+  {id:'wo-interior', cat:'wash-option', name:'室内簡易清掃', desc:'', price:2200},
+  {id:'wo-deodorize', cat:'wash-option', name:'消臭・除菌', desc:'', price:2200}
+];
+
+let carSize = 'M';
+let campaignMode = false;
+let activeCat = 'coating';
+let selected = new Set();
+let fpIncluded = false;
+let fpAddons = new Set(fullPackageAddons.map(a=>a.id));
+
+const carTypeEl = document.getElementById('carType');
+const catNavEl = document.getElementById('catNav');
+const mainEl = document.getElementById('mainArea');
+
+carSizes.forEach(cs=>{
+  const b=document.createElement('button');
+  b.innerHTML = `<span class="sz">${cs.id}</span><span class="cls">${cs.cls}</span>`;
+  b.className = (cs.campaign ? 'cp' : '') + ((cs.campaign ? campaignMode : (!campaignMode && cs.id===carSize)) ? ' active' : '');
+  b.onclick=()=>{
+    if(cs.campaign){ campaignMode = true; activeCat = 'campaign'; }
+    else { campaignMode = false; carSize = cs.id; }
+    render();
+  };
+  b.dataset.id=cs.id;
+  carTypeEl.appendChild(b);
+});
+
+categories.forEach(c=>{
+  const b=document.createElement('button');
+  b.textContent=c.label;
+  b.className= c.id===activeCat ? 'active' : '';
+  b.onclick=()=>{ activeCat=c.id; render(); mainEl.scrollIntoView({behavior:'smooth', block:'start'}); };
+  b.dataset.id=c.id;
+  catNavEl.appendChild(b);
+});
+
+function fmt(n){ return n.toLocaleString('ja-JP'); }
+
+function checkIcon(){
+  return '<svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="#1A1400" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+
+function priceOf(it){
+  if(it.price===undefined) return null;
+  return typeof it.price==='object' ? it.price[carSize] : it.price;
+}
+
+function toggle(it){
+  if(selected.has(it.id)){
+    selected.delete(it.id);
+  } else {
+    if(it.group){
+      items.filter(o=>o.group===it.group).forEach(o=>selected.delete(o.id));
+    }
+    selected.add(it.id);
+  }
+  render();
+}
+
+function render(){
+  Array.from(carTypeEl.children).forEach(b=>{
+    const cs = carSizes.find(s=>s.id===b.dataset.id);
+    const isActive = cs.campaign ? campaignMode : (!campaignMode && cs.id===carSize);
+    b.classList.toggle('active', isActive);
+  });
+  Array.from(catNavEl.children).forEach(b=> b.classList.toggle('active', b.dataset.id===activeCat));
+
+  mainEl.innerHTML='';
+  const cat = categories.find(c=>c.id===activeCat);
+  const heading=document.createElement('div');
+  heading.className='cat-heading';
+  heading.textContent=cat.label;
+  mainEl.appendChild(heading);
+
+  if(catNotes[activeCat]){
+    const note=document.createElement('div');
+    note.className='cat-note';
+    note.textContent=catNotes[activeCat];
+    mainEl.appendChild(note);
+  }
+
+  items.filter(it=>it.cat===activeCat).forEach(it=>{
+    const showAllSizes = (it.cat==='wash' || it.cat==='campaign') && typeof it.price==='object';
+    const row=document.createElement('div');
+    row.className='item' + (selected.has(it.id) ? ' checked' : '') + (showAllSizes ? ' has-table' : '');
+    const price = priceOf(it);
+
+    let priceCol = '';
+    if(!showAllSizes){
+      priceCol = price!==null
+        ? `<div class="item-price">¥${fmt(price)}</div>`
+        : `<div class="item-price range">${(it.rangeNote||'').replace('\n','<br>')}</div>`;
+    }
+
+    let sizeTableHtml = '';
+    if(showAllSizes){
+      sizeTableHtml = `<div class="size-table">` + carSizes.filter(cs=>!cs.campaign).map(cs=>`
+        <div class="sp-cell ${(!campaignMode && cs.id===carSize) ? 'active':''}">
+          <span class="sp-sz">${cs.id}</span>
+          <span class="sp-val">¥${fmt(it.price[cs.id])}</span>
+        </div>
+      `).join('') + `</div>`;
+    }
+
+    row.innerHTML = `
+      <label class="drop">
+        <input type="checkbox" ${selected.has(it.id)?'checked':''} tabindex="-1">
+        <span class="drop-shape"></span>
+        <span class="drop-check">${checkIcon()}</span>
+      </label>
+      <div class="item-body">
+        <div class="item-name">${it.name}</div>
+        ${it.desc ? `<div class="item-desc">${it.desc}</div>` : ''}
+        ${it.tag ? `<span class="item-tag">${it.tag}</span>` : ''}
+        ${sizeTableHtml}
+      </div>
+      ${priceCol}
+    `;
+    row.onclick=()=>toggle(it);
+    mainEl.appendChild(row);
+  });
+
+  if(activeCat==='campaign'){
+    renderFullPackageCard();
+  }
+
+  updateTotal();
+}
+
+function renderFullPackageCard(){
+  const card=document.createElement('div');
+  card.className='fp-card' + (fpIncluded ? ' on' : '');
+
+  const subtotal = fullPackageBase + fullPackageAddons.filter(a=>fpAddons.has(a.id)).reduce((s,a)=>s+a.price,0);
+
+  const addonsHtml = fullPackageAddons.map(a=>{
+    const on = fpAddons.has(a.id);
+    return `
+      <div class="fp-row ${on?'':'off'}" data-addon="${a.id}">
+        <span class="fp-drop"><span class="fp-drop-shape"></span></span>
+        <span class="fp-row-name">${a.name}</span>
+        <span class="fp-row-price">¥${fmt(a.price)}</span>
+      </div>
+    `;
+  }).join('');
+
+  card.innerHTML = `
+    <div class="fp-head" data-fp-master="1">
+      <label class="drop">
+        <input type="checkbox" ${fpIncluded?'checked':''} tabindex="-1">
+        <span class="drop-shape"></span>
+        <span class="drop-check">${checkIcon()}</span>
+      </label>
+      <div>
+        <div class="fp-title">フルパッケージ(全部選ぶなら¥330,000が一番お得・税込)</div>
+        <div class="fp-sub">不要な項目を外すと、その分だけ安くなります(最安 ¥${fmt(fullPackageBase)}・税込)</div>
+      </div>
+    </div>
+    <div class="fp-base"><span>基本プラン(洗車・鉄粉除去・ピッチタール除去・水垢スケール除去・下地処理研磨・CARBON1層)</span><span>¥${fmt(fullPackageBase)}</span></div>
+    <div class="fp-addons">${addonsHtml}</div>
+    <div class="fp-subtotal"><span class="label">このプランの小計</span><span class="val">¥${fmt(subtotal)}</span></div>
+  `;
+
+  card.querySelector('[data-fp-master="1"]').onclick=()=>{ fpIncluded=!fpIncluded; render(); };
+  card.querySelectorAll('.fp-row').forEach(row=>{
+    row.onclick=()=>{
+      const id=row.dataset.addon;
+      if(fpAddons.has(id)) fpAddons.delete(id); else fpAddons.add(id);
+      render();
+    };
+  });
+
+  mainEl.appendChild(card);
+}
+
+function fpSubtotal(){
+  return fullPackageBase + fullPackageAddons.filter(a=>fpAddons.has(a.id)).reduce((s,a)=>s+a.price,0);
+}
+
+function updateTotal(){
+  const selItems = items.filter(it=>selected.has(it.id));
+  let total = 0;
+  let hasRangeItem = false;
+  selItems.forEach(it=>{
+    const p = priceOf(it);
+    if(p!==null) total += p; else hasRangeItem = true;
+  });
+  if(fpIncluded) total += fpSubtotal();
+
+  document.getElementById('totalNum').textContent = fmt(total);
+
+  const note = document.getElementById('bbNote');
+  if(hasRangeItem){
+    note.style.display='block';
+    note.textContent = '+ 樹脂コーティング等、要見積り項目を含みます';
+  } else {
+    note.style.display='none';
+  }
+
+  const countTotal = selected.size + (fpIncluded ? 1 : 0);
+  document.getElementById('selCount').textContent = countTotal + '件選択中';
+}
+
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日';
+}
+
+function finishSelection(){
+  const selItems = items.filter(it=>selected.has(it.id));
+  if(selItems.length===0 && !fpIncluded){
+    alert('メニューが選択されていません。');
+    return;
+  }
+
+  let total = 0;
+  let hasRangeItem = false;
+  let rowsHtml = selItems.map(it=>{
+    const p = priceOf(it);
+    if(p!==null){ total += p; }
+    else { hasRangeItem = true; }
+    const priceText = p!==null ? '¥' + fmt(p) : (it.rangeNote||'要見積り').replace('\n',' ');
+    return `<div class="r-row"><span class="r-rowname">${it.name}</span><span>${priceText}</span></div>`;
+  }).join('');
+
+  if(fpIncluded){
+    total += fpSubtotal();
+    rowsHtml += `<div class="r-row"><span class="r-rowname">フルパッケージ:基本プラン</span><span>¥${fmt(fullPackageBase)}</span></div>`;
+    fullPackageAddons.filter(a=>fpAddons.has(a.id)).forEach(a=>{
+      rowsHtml += `<div class="r-row"><span class="r-rowname">フルパッケージ:${a.name}</span><span>¥${fmt(a.price)}</span></div>`;
+    });
+  }
+
+  const carSizeLabel = carSizes.find(cs=>cs.id===carSize);
+
+  document.getElementById('printArea').innerHTML = `
+    <div class="receipt">
+      <div class="r-shopname">Wash Garden</div>
+      <div class="r-sub">セラミックコーティング専門店</div>
+      <div class="r-meta">
+        <div><span>日付</span><span>${todayStr()}</span></div>
+        <div><span>車種区分</span><span>${carSizeLabel.id}(${carSizeLabel.cls})</span></div>
+      </div>
+      <div class="r-rows">${rowsHtml}</div>
+      <div class="r-total"><span>合計(税込)</span><span>¥${fmt(total)}</span></div>
+      ${hasRangeItem ? '<div class="r-note">※樹脂コーティング等、要見積り項目は合計に含まれていません</div>' : ''}
+      <div class="r-field">
+        <div class="label">お電話番号</div>
+        <div class="line"></div>
+      </div>
+      <div class="r-field">
+        <div class="label">ご署名</div>
+        <div class="line"></div>
+      </div>
+    </div>
+  `;
+
+  window.print();
+}
+
+render();
+</script>
+</body>
+</html>
